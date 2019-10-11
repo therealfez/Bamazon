@@ -12,7 +12,5 @@ PRIMARY KEY (id)
 );
 
 INSERT INTO product (item, price, category, quantity)
-VALUES ("Skateboard", 120, "Sports", 20);
+VALUES ("Skateboard", 119.95, "Sports", 14),("Basketball", 24.99, "Sports", 17), ("Headset", 75.64, "Technology", 3), ("Smart Phone", 799.99, "Technology", 48), ("Sofa", 554.99, "Furniture", 0), ("Table", 99.99, "Furniture", 11);
 
-
-SELECT * FROM product;

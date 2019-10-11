@@ -40,25 +40,51 @@ function run() {
 
 run();
 
- 
+
 function purchaseItem() {
     var query = "SELECT * FROM product";
-    connection.query(query, function(err,res){
+    connection.query(query, function (err, res) {
         console.table(res);
+        if (err) throw err;
         var arr = []
         for (let i = 0; i < res.length; i++) {
             const element = res[i];
-            arr.push(element.id)
+            arr.push(element.item)
         }
         inquirer.prompt([
             {
                 type: "rawlist",
-                message: "Welcome to Bamazon. What would you like to do?",
+                message: "What would you like to purchase?",
                 choices: arr,
                 name: "choice"
+            },
+            {
+                type: "number",
+                message: "How many?",
+                name: "quantity"
             }
-        ]).then(function(answer){
-            console.log(answer.choice)
+        ]).then(function (answer) {
+            var item = answer.choice
+            var ammount = answer.quantity;
+            connection.query("SELECT * FROM product WHERE item = ?", item, function (err, res) {
+                if (res[0].quantity < ammount) {
+                    console.log(`Unfortunately, we do not have enough ${item}(s) in stock to complete your purchase today.`)
+                    connection.end();
+                } else {
+                    console.log(`You are buying ${ammount} ${item}(s) for ${res[0].price * ammount}`);
+
+                    var newQuantity = res[0].quantity - ammount;
+                    console.log(newQuantity);
+                    var update = `UPDATE product SET quantity = ${newQuantity} WHERE item = "${item}"`
+                    connection.query(update, function (err, resUpdate) {
+                        if (err) throw err;
+                        console.log("Your order has been processed.");
+                        console.log("Thank you for shopping at Bamazon!")
+                        run();
+                    })
+                };
+            });
+
         })
     })
 };
